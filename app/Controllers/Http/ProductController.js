@@ -24,6 +24,16 @@ class ProductController {
     }
 
   }
+
+  async show ({ params, request, response, view }) {
+
+    const products = await Product.find(params.id)
+
+    return {
+      data: products
+    }
+
+  }
 }
 
 module.exports = ProductController

@@ -7,11 +7,11 @@ class ProductSchema extends Schema {
   up () {
     this.create('products', (table) => {
       table.increments()
-      table.string('nameProduct', 50).notNullable()
-      table.string('priceHolder', 50).notNullable()
-      table.string('imageHolder', 300)
-      table.string('quantity', 50).notNullable()
-      table.string('navProduct', 100)
+      table.string('nameProduct', 100)
+      table.string('imageHolder', 100)
+      table.double('priceHolder')
+      table.text('description')
+      table.timestamps()
     })
   }
 

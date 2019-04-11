@@ -16,8 +16,17 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-// Grouped
+// Grouped Product
 Route.group(() => {
   Route.get('/products', 'ProductController.index')
+  Route.get('/products/:id', 'ProductController.show')
   Route.post('/product', 'ProductController.store')
+}).prefix('api/v1')
+
+// Grouped Order
+Route.group(() => {
+  Route.get('/orders', 'OrderController.index')
+  Route.post('/order', 'OrderController.store')
+  Route.patch('/order/:id', 'OrderController.update')
+  Route.delete('/order/:id', 'OrderController.destroy')
 }).prefix('api/v1')
