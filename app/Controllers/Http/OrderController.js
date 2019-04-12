@@ -57,7 +57,9 @@ class OrderController {
 
     if(order){
       const {qty} = request.post();
+      const {price} = request.post();
       order.qty = qty;
+      order.price = price * qty;
       await order.save();
       return{
         message: 'Data updated success',
