@@ -35,6 +35,16 @@ class OrderController {
   }
 
   async show ({ params, request, response, view }) {
+
+    const orders = await await Database
+                              .table('orders')
+                              .innerJoin('products', 'orders.product_id', 'products.id')
+                              .where('products.id',params.id)
+
+    return {
+      data: orders
+    }
+
   }
 
   async edit ({ params, request, response, view }) {
@@ -64,12 +74,14 @@ class OrderController {
 
   async destroy ({ params, request, response }) {
 
-    const {id} = params;
-    const order = await Order.find(id);
-    await order.delete();
+    const order = await Database
+                        .table('orders')
+                        .innerJoin('products', 'orders.product_id', 'products.id')
+                        .where('orders.product_id',params.id)
+                        .delete()
     return{
       message: 'Data deleted success',
-      data: id
+      data: order
     }
 
   }

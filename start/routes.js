@@ -26,6 +26,7 @@ Route.group(() => {
 // Grouped Order
 Route.group(() => {
   Route.get('/orders', 'OrderController.index')
+  Route.get('/orders/:id', 'OrderController.show')
   Route.post('/order', 'OrderController.store')
   Route.patch('/order/:id', 'OrderController.update')
   Route.delete('/order/:id', 'OrderController.destroy')
