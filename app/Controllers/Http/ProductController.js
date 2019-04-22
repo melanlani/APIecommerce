@@ -25,7 +25,7 @@ class ProductController {
 
   }
 
-  async show ({ params, request, response, view }) {
+  async show ({ params, request, response, view, auth }) {
 
     const products = await Product.find(params.id)
 

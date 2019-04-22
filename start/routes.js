@@ -31,3 +31,10 @@ Route.group(() => {
   Route.patch('/order/:id', 'OrderController.update')
   Route.delete('/order/:id', 'OrderController.destroy')
 }).prefix('api/v1')
+
+// Grouped User
+Route.group(() => {
+  Route.post('/register', 'UserController.register')
+  Route.post('/login', 'UserController.login')
+  Route.get('/users', 'UserController.index').middleware('auth')
+}).prefix('api/v1')

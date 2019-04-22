@@ -6,13 +6,17 @@ class OrderController {
 
   async index ({ request, response, view }) {
 
-    const orders = await Database
-                        .table('orders')
-                        .innerJoin('products', 'orders.product_id', 'products.id')
-
-    return {
-      data: orders
+    try {
+      const orders = await Database
+                          .table('orders')
+                          .select('orders.id as orderId', 'products.*', 'orders.*',)
+                          .innerJoin('products', 'orders.product_id', 'products.id')
+      return response.status(200).send({data: orders})
     }
+		catch (e) {
+      console.log(e);
+      return response.status(400).send({'message':'Something went wrong!'})
+		}
 
   }
 
@@ -20,73 +24,84 @@ class OrderController {
   }
 
   async store ({ request, response }) {
-    const {price, qty, product_id} = request.post();
-    const order = new Order();
-    order.price = price;
-    order.qty = qty;
-    order.product_id = product_id;
-    await order.save();
 
-    return {
-      message: "data saved success",
-      data: order
+    try {
+      const {price, qty, product_id} = request.post();
+      const order = new Order();
+      order.price = price;
+      order.qty = qty;
+      order.product_id = product_id;
+      await order.save();
+
+      return response.status(200).send({data: order})
+    }
+    catch (e) {
+      console.log(e);
+      return response.status(400).send({'message':'Something went wrong!'})
     }
 
   }
 
   async show ({ params, request, response, view }) {
 
-    const orders = await await Database
-                              .table('orders')
-                              .innerJoin('products', 'orders.product_id', 'products.id')
-                              .where('products.id',params.id)
+    try {
+      const { id } = params
+      const orders = await Database
+                                .table('orders')
+                                .select('orders.id as orderId', 'products.*', 'orders.*',)
+                                .innerJoin('products', 'orders.product_id', 'products.id')
+                                .where('orders.id',id)
+      if({data: orders == null})
+        return response.status(404).send({'message':'Data not found!'})
 
-    return {
-      data: orders
+      return response.status(200).send({data: orders})
+    } catch (e) {
+      console.log(e);
+      return response.status(400).send({'message':'Something went wrong!'})
     }
 
   }
 
-  async edit ({ params, request, response, view }) {
-  }
+  async update ({params, request, response, auth }) {
 
-  async update ({ params, request, response }) {
+    try {
+      const { id } = params
+      const {qty, price} = await request.all()
 
-    const {id} = params;
-    const order = await Order.find(id);
+      const order = await Order.find(id)
+      if(order == null)
+        return response.status(404).send({'message':'Data not found!'})
 
-    if(order){
-      const {qty} = request.post();
-      const {price} = request.post();
-      order.qty = qty;
-      order.price = price * qty;
-      await order.save();
-      return{
-        message: 'Data updated success',
-        data: order
-      }
-    }else{
-      return{
-        message: 'Data failed to updated.',
-        data: id
-      }
+      let totalPrice = await price*qty;
+      await order.merge({
+        qty: qty,
+        price: totalPrice
+      })
+      await order.save()
+
+      return response.status(200).send({'message': 'Data updated success', data: order})
+    } catch (e) {
+      console.log(e);
+      return response.status(400).send({'message':'Something went wrong!'})
     }
 
   }
 
   async destroy ({ params, request, response }) {
-
+    try{
+    const { id } = params
     const order = await Database
                         .table('orders')
                         .innerJoin('products', 'orders.product_id', 'products.id')
-                        .where('orders.product_id',params.id)
+                        .where('orders.product_id',id)
                         .delete()
-    return{
-      message: 'Data deleted success',
-      data: order
+    return response.status(200).send({'message' : 'Data deleted success', data: order})
+    } catch (e) {
+      console.log(e);
+      return response.status(400).send({'message':'Something went wrong!'})
     }
-
   }
+
 }
 
 module.exports = OrderController
